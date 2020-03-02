@@ -8,7 +8,6 @@ using Sidekick.Business.Apis.PoeWiki;
 using Sidekick.Business.Categories;
 using Sidekick.Business.Http;
 using Sidekick.Business.Languages;
-using Sidekick.Business.Leagues;
 using Sidekick.Business.Maps;
 using Sidekick.Business.Parsers;
 using Sidekick.Business.Tokenizers;
@@ -16,7 +15,6 @@ using Sidekick.Business.Tokenizers.ItemName;
 using Sidekick.Business.Trades;
 using Sidekick.Business.Whispers;
 using Sidekick.Core;
-using Sidekick.Core.Settings;
 
 namespace Sidekick.Business
 {
@@ -43,7 +41,6 @@ namespace Sidekick.Business
             services.AddInitializableService<IPoeApiClient, PoeApiClient>();
             services.AddInitializableService<IAttributeCategoryService, AttributeCategoryService>();
             services.AddInitializableService<IItemCategoryService, ItemCategoryService>();
-            services.AddInitializableService<ILeagueService, LeagueService>();
             services.AddInitializableService<IMapService, MapService>();
             services.AddInitializableService<IPoeNinjaCache, PoeNinjaCache>();
             services.AddInitializableService<IStaticItemCategoryService, StaticItemCategoryService>();

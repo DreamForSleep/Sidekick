@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using PathOfExile.Apis;
 using Sidekick.Business;
 using Sidekick.Core;
 using Sidekick.Localization;
@@ -11,12 +12,13 @@ namespace Sidekick
         public static ServiceProvider InitializeServices(App application)
         {
             var services = new ServiceCollection()
-              .AddSidekickConfiguration()
-              .AddSidekickCoreServices()
-              .AddSidekickBusinessServices()
-              .AddSidekickLocalization()
-              .AddSidekickUIServices()
-              .AddSidekickUIWindows();
+                .AddPathOfExileServices()
+                .AddSidekickConfiguration()
+                .AddSidekickCoreServices()
+                .AddSidekickBusinessServices()
+                .AddSidekickLocalization()
+                .AddSidekickUIServices()
+                .AddSidekickUIWindows();
 
             services.AddSingleton(application);
 

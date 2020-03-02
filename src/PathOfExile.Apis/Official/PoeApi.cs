@@ -4,29 +4,55 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using PathOfExile.Apis.Official.Models;
 using PathOfExile.Apis.Official.Trade.Leagues;
-using Sidekick.Business.Apis.Poe.Models;
-using Sidekick.Business.Languages;
-using Sidekick.Core.Loggers;
 
-namespace Sidekick.Business.Apis.Poe
+namespace PathOfExile.Apis.Official
 {
-    public class PoeApiClient : IPoeApiClient
+    public class PoeApi : IPoeApi
     {
         private readonly ILogger logger;
-        private readonly ILanguageProvider languageProvider;
         private readonly HttpClient client;
 
-        public PoeApiClient(ILogger logger,
-            ILanguageProvider languageProvider,
+        public PoeApi(ILogger logger,
             IHttpClientFactory httpClientFactory)
         {
             this.logger = logger;
-            this.languageProvider = languageProvider;
-            this.client = httpClientFactory.CreateClient();
+            client = httpClientFactory.CreateClient("poe_api");
+            client.BaseAddress = new Uri("https://www.pathofexile.com/api/");
         }
 
-        public JsonSerializerOptions Options
+        private Language language;
+        public Language Language
+        {
+            get
+            {
+                return language;
+            }
+            set
+            {
+                language = value;
+                client.BaseAddress = new Uri(BaseApiUrl);
+            }
+        }
+
+        public HttpClient Client { get; private set; }
+
+        private string BaseApiUrl => Language switch
+        {
+            Language.French => "https://fr.pathofexile.com/api/",
+            Language.German => "https://de.pathofexile.com/api/",
+            Language.Korean => "https://poe.game.daum.net/api/",
+            Language.Portuguese => "https://br.pathofexile.com/api/",
+            Language.Russian => "https://ru.pathofexile.com/api/",
+            Language.Spanish => "https://es.pathofexile.com/api/",
+            Language.Thai => "https://th.pathofexile.com/api/",
+            Language.TraditionalChinese => "http://web.poe.garena.tw/api/",
+            _ => "https://www.pathofexile.com/api/"
+        };
+
+        public JsonSerializerOptions JsonOptions
         {
             get
             {
@@ -65,7 +91,7 @@ namespace Sidekick.Business.Apis.Poe
                 default: throw new Exception("The type to fetch is not recognized by the PoeApiService.");
             }
 
-            logger.Log($"Fetching {name} started.");
+            logger.LogInformation($"Fetching {name} started.");
             QueryResult<TReturn> result = null;
             var success = false;
 
@@ -73,25 +99,24 @@ namespace Sidekick.Business.Apis.Poe
             {
                 try
                 {
-                    var response = await client.GetAsync(languageProvider.Language.PoeTradeApiBaseUrl + path);
+                    var response = await client.GetAsync(BaseApiUrl + path);
                     var content = await response.Content.ReadAsStreamAsync();
 
-                    result = await JsonSerializer.DeserializeAsync<QueryResult<TReturn>>(content, Options);
+                    result = await JsonSerializer.DeserializeAsync<QueryResult<TReturn>>(content, JsonOptions);
 
-                    logger.Log($"{result.Result.Count} {name} fetched.");
+                    logger.LogInformation($"{result.Result.Count} {name} fetched.");
                     success = true;
                 }
                 catch
                 {
-                    logger.Log($"Could not fetch {name}.");
-                    logger.Log("Retrying every minute.");
+                    logger.LogInformation($"Could not fetch {name}.");
+                    logger.LogInformation("Retrying every minute.");
                     await Task.Delay(TimeSpan.FromMinutes(1));
                 }
             }
 
-            logger.Log($"Fetching {name} finished.");
+            logger.LogInformation($"Fetching {name} finished.");
             return result.Result;
         }
-
     }
 }

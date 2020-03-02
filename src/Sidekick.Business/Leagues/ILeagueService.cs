@@ -1,5 +1,5 @@
-using Sidekick.Business.Apis.Poe.Models;
 using System.Collections.Generic;
+using PathOfExile.Apis.Official.Trade.Leagues;
 
 namespace Sidekick.Business.Leagues
 {

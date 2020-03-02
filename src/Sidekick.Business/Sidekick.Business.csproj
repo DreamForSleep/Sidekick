@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\PathOfExile.Apis\PathOfExile.Apis.csproj" />
     <ProjectReference Include="..\Sidekick.Core\Sidekick.Core.csproj" />
   </ItemGroup>
 

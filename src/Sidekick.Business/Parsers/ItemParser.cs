@@ -186,7 +186,32 @@ namespace Sidekick.Business.Parsers
                 }
                 else if (rarity == Rarity.Magic)
                 {
-                    throw new Exception("Magic items are not yet supported.");
+                    item = new EquippableItem()
+                    {
+                        Name = lines[1],
+                        Type = isIdentified ? lines[2] : lines[1],
+                        ItemLevel = GetNumberFromString(lines.Where(c => c.StartsWith(languageProvider.Language.DescriptionItemLevel)).FirstOrDefault()),
+                    };
+
+                    var links = GetLinkCount(lines.Where(c => c.StartsWith(languageProvider.Language.DescriptionSockets)).FirstOrDefault());
+
+                    if (links >= 5)
+                    {
+                        ((EquippableItem)item).Links = new SocketFilterOption()
+                        {
+                            Min = links,
+                            Max = links,
+                        };
+                    }
+
+                    if (hasNote)
+                    {
+                        ((EquippableItem)item).Influence = GetInfluenceType(lines[lines.Length - 3]);
+                    }
+                    else
+                    {
+                        ((EquippableItem)item).Influence = GetInfluenceType(lines.LastOrDefault());
+                    }
                 }
                 else if (rarity == Rarity.Normal)
                 {
